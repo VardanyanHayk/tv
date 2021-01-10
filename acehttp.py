@@ -31,6 +31,7 @@ import threading
 import urllib2
 import urllib
 import urlparse
+import requests
 import Queue
 import aceclient
 import aceconfig
@@ -581,7 +582,7 @@ def drop_privileges(uid_name, gid_name='nogroup'):
     os.setuid(running_uid)
 
     # Ensure a very conservative umask
-    old_umask = os.umask(077)
+    old_umask = os.umask(o077)
 
     if os.getuid() == running_uid and os.getgid() == running_gid:
         # could be useful
@@ -610,6 +611,7 @@ pluginsmatch = glob.glob('plugins/*_plugin.py')
 sys.path.insert(0, 'plugins')
 pluginslist = [os.path.splitext(os.path.basename(x))[0] for x in pluginsmatch]
 for i in pluginslist:
+    print('>>>>>>>>>>>>>', i)
     plugin = __import__(i)
     plugname = i.split('_')[0].capitalize()
     try:
@@ -617,7 +619,7 @@ for i in pluginslist:
     except Exception as e:
         logger.error("Cannot load plugin " + plugname + ": " + repr(e))
         continue
-    logger.debug('Plugin loaded: ' + plugname)
+    logger.debug('Plugin loaded: '  + ' <<<<<<<<<')
     for j in plugininstance.handlers:
         AceStuff.pluginshandlers[j] = plugininstance
     AceStuff.pluginlist.append(plugininstance)
@@ -654,7 +656,7 @@ def spawnVLC(cmd, delay=0):
             try:
                 key = _winreg.OpenKey(reg, 'Software\AceStream')
             except:
-                print "Can't find AceStream!"
+                print ("Can't find AceStream!")
                 sys.exit(1)
             dir = _winreg.QueryValueEx(key, 'InstallDir')
             playerdir = os.path.dirname(dir[0] + '\\player\\')
@@ -674,7 +676,7 @@ def connectVLC():
             out_port=AceConfig.vlcoutport)
         return True
     except vlcclient.VlcException as e:
-        print repr(e)
+        print (e)
         return False
 
 def checkVlc():
@@ -693,7 +695,7 @@ def spawnAce(cmd, delay=0):
         try:
             key = _winreg.OpenKey(reg, 'Software\AceStream')
         except:
-            print "Can't find acestream!"
+            print ("Can't find acestream!")
             sys.exit(1)
         engine = _winreg.QueryValueEx(key, 'EnginePath')
         AceStuff.acedir = os.path.dirname(engine[0])
@@ -737,7 +739,7 @@ def detectPort():
     try:
         key = _winreg.OpenKey(reg, 'Software\AceStream')
     except:
-        print "Can't find AceStream!"
+        print ("Can't find AceStream!")
         sys.exit(1)
     engine = _winreg.QueryValueEx(key, 'EnginePath')
     AceStuff.acedir = os.path.dirname(engine[0])
@@ -818,7 +820,7 @@ def _reloadconfig(signum=None, frame=None):
 
 # setting signal handlers
 try:
-    gevent.signal(signal.SIGHUP, _reloadconfig)
+    gevent.signal(signal.SIGNUP, _reloadconfig)
     gevent.signal(signal.SIGTERM, shutdown)
 except AttributeError:
     # not available on Windows
